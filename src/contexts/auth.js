@@ -12,7 +12,7 @@ function AuthProvider({ children }) {
     function loadStorage() {
       const storageUser = localStorage.getItem('SistemaUser');
 
-      if(storageUser) {
+      if (storageUser) {
         setUser(JSON.parse(storageUser));
         setLoading(false);
       }
@@ -22,8 +22,56 @@ function AuthProvider({ children }) {
     loadStorage();
   }, [])
 
+  async function signUp(email, password, name) {
+    setLoadingAuth(true);
+    await firebase.auth().createUserWithEmailAndPassword(email, password)
+      .then(async (value) => {
+        let uid = value.user.uid;
+
+        await firebase.firestore().collection('users')
+          .doc(uid).set({
+            name: name,
+            avatarUrl: null,
+          })
+          .then(() => {
+            let data = {
+              uid: uid,
+              name: name,
+              email: value.user.email,
+              avatarUrl: null
+            };
+
+            setUser(data);
+            storageUser(data);
+            setLoadingAuth(false);
+          })
+      })
+      .catch((error) => {
+        console.log(error);
+        setLoadingAuth(false);
+      })
+  }
+
+  function storageUser(data) {
+    localStorage.setItem('SistemaUser', JSON.stringify(data))
+  }
+
+  async function signOut() {
+    await firebase.auth().signOut();
+    localStorage.removeItem('SistemaUser');
+    setUser(null);
+  }
+
   return (
-    <AuthContext.Provider value={{ signed: !!user, user, loading }}>
+    <AuthContext.Provider
+      value={{
+        signed: !!user,
+        user,
+        loading,
+        signUp,
+        signOut
+      }}
+    >
       {children}
     </AuthContext.Provider>
   )
