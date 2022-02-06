@@ -3,6 +3,7 @@ import firebase from '../../services/firebaseConnection';
 import Header from '../../components/Header/Header';
 import Title from '../../components/Title/Title';
 import { AuthContext } from '../../contexts/auth';
+import { toast } from 'react-toastify';
 import './New.css';
 import { FiPlus } from 'react-icons/fi';
 
@@ -50,8 +51,28 @@ export default function New() {
     loadCustomers();
   }, [])
 
-  function handleRegister(e) {
+  async function handleRegister(e) {
     e.preventDefault();
+
+    await firebase.firestore().collection('chamados')
+    .add({
+      created: new Date(),
+      cliente: customers[customerSelected].nomeFantasia,
+      clienteId: customers[customerSelected].id,
+      assunto: assunto,
+      status: status,
+      complemento: complemento,
+      userId: user.uid
+    })
+    .then(()=>{
+      toast.success('Chamado registrado com sucesso !');
+      setComplemento('');
+      setCustomersSelected(0);
+    })
+    .catch((error)=>{
+      toast.error('Erro ao registrar');
+      console.log(error);
+    })
   }
 
   function handleChangeSelect(e) {
@@ -95,6 +116,8 @@ export default function New() {
                   })}
                 </select>
               )}
+              <br/>
+              <br/>
 
             <label>Assunto</label>
             <select value={assunto} onChange={handleChangeSelect}>
@@ -102,6 +125,8 @@ export default function New() {
               <option value='Visita Tecnica'>Visita Técnica</option>
               <option value='Financeiro'>Financeiro</option>
             </select>
+            <br/>
+            <br/>
 
             <label>Status</label>
             <div className='status'>
@@ -132,6 +157,8 @@ export default function New() {
               />
               <span>Atendido</span>
             </div>
+            <br/>
+            <br/>
 
             <label>Complemento</label>
             <textarea
