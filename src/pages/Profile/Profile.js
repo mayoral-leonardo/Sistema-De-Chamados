@@ -34,7 +34,7 @@ export default function Profile() {
 
   async function handleUpload() {
     const currentUid = user.uid;
-    const uploadTask = await firebase.storage()
+    await firebase.storage()
       .ref(`images/${currentUid}/${imageAvatar.name}`)
       .put(imageAvatar)
       .then(async () => {

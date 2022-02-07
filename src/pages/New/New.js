@@ -25,6 +25,24 @@ export default function New() {
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
+    async function loadId(lista) {
+      await firebase.firestore().collection('chamados').doc(id)
+        .get()
+        .then((snapshot) => {
+          setAssunto(snapshot.data().assunto);
+          setStatus(snapshot.data().status);
+          setComplemento(snapshot.data().complemento);
+
+          const index = lista.findIndex(item => item.id === snapshot.data().clienteId);
+          setCustomersSelected(index);
+          setIdCostumer(true);
+        })
+        .catch((error) => {
+          console.log('ERRO NO ID FORNECIDO', error);
+          setIdCostumer(false);
+        })
+    }
+
     async function loadCustomers() {
       await firebase.firestore().collection('customers')
         .get()
@@ -61,23 +79,6 @@ export default function New() {
     loadCustomers();
   }, [id])
 
-  async function loadId(lista) {
-    await firebase.firestore().collection('chamados').doc(id)
-      .get()
-      .then((snapshot) => {
-        setAssunto(snapshot.data().assunto);
-        setStatus(snapshot.data().status);
-        setComplemento(snapshot.data().complemento);
-
-        const index = lista.findIndex(item => item.id === snapshot.data().clienteId);
-        setCustomersSelected(index);
-        setIdCostumer(true);
-      })
-      .catch((error) => {
-        console.log('ERRO NO ID FORNECIDO', error);
-        setIdCostumer(false);
-      })
-  }
 
   async function handleRegister(e) {
     e.preventDefault();

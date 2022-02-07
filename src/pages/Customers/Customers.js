@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import './Customers.css';
 import firebase from '../../services/firebaseConnection';
 import Title from "../../components/Title/Title";
