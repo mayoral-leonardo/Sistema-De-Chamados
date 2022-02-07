@@ -116,7 +116,7 @@ export default function Profile() {
             <input type='text' value={name} onChange={(e) => setName(e.target.value)}></input>
 
             <label>E-mail</label>
-            <input type='text' value={email} disabled={true}></input>
+            <input type='text' value={email} disabled={true} onChange={(e) => setEmail(e.target.value)}></input>
 
             <button type='submit'>Salvar</button>
           </form>
