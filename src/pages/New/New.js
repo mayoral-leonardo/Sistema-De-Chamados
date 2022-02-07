@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import firebase from '../../services/firebaseConnection';
+import { useHistory, useParams } from 'react-router-dom';
 import Header from '../../components/Header/Header';
 import Title from '../../components/Title/Title';
 import { AuthContext } from '../../contexts/auth';
@@ -8,6 +9,9 @@ import './New.css';
 import { FiPlus } from 'react-icons/fi';
 
 export default function New() {
+  const { id } = useParams();
+  const history = useHistory();
+
   const [customers, setCustomers] = useState([]);
   const [loadCustomers, setLoadCustomers] = useState(true);
   const [customerSelected, setCustomersSelected] = useState(0);
@@ -15,6 +19,8 @@ export default function New() {
   const [assunto, setAssunto] = useState('Suporte');
   const [status, setStatus] = useState('Aberto');
   const [complemento, setComplemento] = useState('');
+
+  const [idCostumer, setIdCostumer] = useState(false);
 
   const { user } = useContext(AuthContext);
 
@@ -41,6 +47,10 @@ export default function New() {
 
           setCustomers(lista)
           setLoadCustomers(false);
+
+          if (id) {
+            loadId(lista);
+          }
         })
         .catch((error) => {
           console.log(error);
@@ -49,30 +59,72 @@ export default function New() {
         })
     }
     loadCustomers();
-  }, [])
+  }, [id])
+
+  async function loadId(lista) {
+    await firebase.firestore().collection('chamados').doc(id)
+      .get()
+      .then((snapshot) => {
+        setAssunto(snapshot.data().assunto);
+        setStatus(snapshot.data().status);
+        setComplemento(snapshot.data().complemento);
+
+        const index = lista.findIndex(item => item.id === snapshot.data().clienteId);
+        setCustomersSelected(index);
+        setIdCostumer(true);
+      })
+      .catch((error) => {
+        console.log('ERRO NO ID FORNECIDO', error);
+        setIdCostumer(false);
+      })
+  }
 
   async function handleRegister(e) {
     e.preventDefault();
 
+    if (idCostumer) {
+      await firebase.firestore().collection('chamados').doc(id)
+        .update({
+          cliente: customers[customerSelected].nomeFantasia,
+          clienteId: customers[customerSelected].id,
+          assunto: assunto,
+          status: status,
+          complemento: complemento,
+          userId: user.uid
+        })
+        .then(() => {
+          toast.success('Chamado editado com sucesso !');
+          setCustomersSelected(0);
+          setComplemento('');
+          history.push('/dashboard');
+        })
+        .catch((error) => {
+          toast.error('Erro ao editar !');
+          console.log(error);
+        })
+
+      return;
+    }
+
     await firebase.firestore().collection('chamados')
-    .add({
-      created: new Date(),
-      cliente: customers[customerSelected].nomeFantasia,
-      clienteId: customers[customerSelected].id,
-      assunto: assunto,
-      status: status,
-      complemento: complemento,
-      userId: user.uid
-    })
-    .then(()=>{
-      toast.success('Chamado registrado com sucesso !');
-      setComplemento('');
-      setCustomersSelected(0);
-    })
-    .catch((error)=>{
-      toast.error('Erro ao registrar');
-      console.log(error);
-    })
+      .add({
+        created: new Date(),
+        cliente: customers[customerSelected].nomeFantasia,
+        clienteId: customers[customerSelected].id,
+        assunto: assunto,
+        status: status,
+        complemento: complemento,
+        userId: user.uid
+      })
+      .then(() => {
+        toast.success('Chamado registrado com sucesso !');
+        setComplemento('');
+        setCustomersSelected(0);
+      })
+      .catch((error) => {
+        toast.error('Erro ao registrar');
+        console.log(error);
+      })
   }
 
   function handleChangeSelect(e) {
@@ -116,8 +168,8 @@ export default function New() {
                   })}
                 </select>
               )}
-              <br/>
-              <br/>
+            <br />
+            <br />
 
             <label>Assunto</label>
             <select value={assunto} onChange={handleChangeSelect}>
@@ -125,8 +177,8 @@ export default function New() {
               <option value='Visita Tecnica'>Visita Técnica</option>
               <option value='Financeiro'>Financeiro</option>
             </select>
-            <br/>
-            <br/>
+            <br />
+            <br />
 
             <label>Status</label>
             <div className='status'>
@@ -157,8 +209,8 @@ export default function New() {
               />
               <span>Atendido</span>
             </div>
-            <br/>
-            <br/>
+            <br />
+            <br />
 
             <label>Complemento</label>
             <textarea
