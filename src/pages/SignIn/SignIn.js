@@ -13,8 +13,8 @@ export default function SignIn() {
   function handleSubmit(e){
     e.preventDefault();
     if(email !== '' && password !== '') signIn(email, password);
-    if(email === '') toast.error('Insira o e-mail!');
-    if(email !== '' && password === '') toast.error('Insira a senha!');
+    if(email === '') toast.error('Insira o e-mail !');
+    if(email !== '' && password === '') toast.error('Insira a senha !');
   }
 
   return (

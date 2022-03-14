@@ -46,8 +46,8 @@ function AuthProvider({ children }) {
       })
       .catch((error) => {
         console.log(error);
-        if(error.code === 'auth/invalid-email') toast.error('E-mail inválido!')
-        else if(error.code === 'auth/wrong-password') toast.error('Senha incorreta!')
+        if(error.code === 'auth/invalid-email') toast.error('E-mail inválido !');
+        else if(error.code === 'auth/wrong-password') toast.error('Senha incorreta !');
         else toast.error('Ops... algo deu errado !');
         setLoadingAuth(false)
       })
@@ -81,8 +81,8 @@ function AuthProvider({ children }) {
       })
       .catch((error) => {
         console.log(error);
-        if(error.code === 'auth/invalid-email') toast.error('E-mail inválido!')
-        else if(error.code === 'auth/weak-password') toast.error('A senha precisa conter, no mínimo, 6 carateres!')
+        if(error.code === 'auth/invalid-email') toast.error('E-mail inválido !');
+        else if(error.code === 'auth/weak-password') toast.error('A senha precisa conter, no mínimo, 6 carateres !');
         else toast.error('Ops... algo deu errado !');
         setLoadingAuth(false)
       })
