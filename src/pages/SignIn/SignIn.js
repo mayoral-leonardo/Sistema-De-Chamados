@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../../contexts/auth";
 import './SignIn.css';
 import logo from '../../assets/images/logo.png';
+import { toast } from "react-toastify";
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -11,7 +12,9 @@ export default function SignIn() {
 
   function handleSubmit(e){
     e.preventDefault();
-    if(email !== '' && password !== '') signIn(email, password)
+    if(email !== '' && password !== '') signIn(email, password);
+    if(email === '') toast.error('Insira o e-mail!');
+    if(email !== '' && password === '') toast.error('Insira a senha!');
   }
 
   return (
